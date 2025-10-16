@@ -28,7 +28,7 @@
             <a
                 href="{% url 'bulk-delete-tasks' %}"
                 class="link link-primary"
-                hx-post="{% url 'bulk-delete-tasks' %}"
+                hx-delete="{% url 'bulk-delete-tasks' %}"
                 hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
                 hx-target="#task_list"
             >Clear completed</a>

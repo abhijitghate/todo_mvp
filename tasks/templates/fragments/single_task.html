@@ -3,7 +3,7 @@
     <input id="checkbox-id-{{task.pk}}" type="checkbox" class="checkbox checkbox-success" 
     {% if task.completed %}checked{% endif %} 
       hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
-      hx-post="{% url 'update-task' task.pk %}"
+      hx-patch="{% url 'update-task' task.pk %}"
       hx-vals='js:{...getCompletedObj("{{ task.completed }}", "{{ task.title }}")}' hx-target="#list_row_{{task.pk}}"
       hx-swap="outerHTML" />
 
@@ -73,11 +73,12 @@
             if (taskId) {
               const form = document.createElement('form');
               form.style.display = 'none';
-              form.method = 'POST';
+              form.method = 'PATCH';
               form.action = `/update/${_taskPk}/`;
-              form.setAttribute('hx-post', `/update/${_taskPk}/`);
+              form.setAttribute('hx-patch', `/update/${_taskPk}/`);
               form.setAttribute('hx-target', htmxTarget);
               form.setAttribute('hx-swap', 'innerHTML');
+              form.setAttribute('hx-headers', '{"X-CSRFToken": "{{ csrf_token }}"}');
               form.addEventListener('htmx:afterRequest', function (event) {
                 if (event.detail && event.detail.xhr) {
                   try {
