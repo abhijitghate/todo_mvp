@@ -1,0 +1,145 @@
+<li class="list-row" id="list_row_{{task.pk}}">
+  <div>
+    <input id="checkbox-id-{{task.pk}}" type="checkbox" class="checkbox checkbox-success" 
+    {% if task.completed %}checked{% endif %} 
+      hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' 
+      hx-post="{% url 'update-task' task.pk %}"
+      hx-vals='js:{...getCompletedObj("{{ task.completed }}", "{{ task.title }}")}' hx-target="#list_row_{{task.pk}}"
+      hx-swap="outerHTML" />
+
+  </div>
+  <div id="task-unique-div-id-{{task.pk}}">
+    {% if task.completed %}
+    <div id="task-unique-id-{{task.pk}}" style="text-decoration: line-through; opacity: 0.5;">{{ task.title }}</div>
+    {% else %}
+    <div id="task-unique-id-{{task.pk}}">{{ task.title }}</div>
+    {% endif %}
+
+
+  </div>
+  <button class="btn btn-error" hx-delete="{% url 'delete-task' task.pk %}"
+    hx-on:task-deleted="this.closest('.list-row').remove();" hx-confirm="Are you sure you wish to delete this task?"
+    hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}' hx-target="#task_list">Delete</button>
+
+</li>
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    document.querySelectorAll('.list-row').forEach(function (row) {
+      let editing = false;
+      let original = '';
+
+      row.addEventListener('dblclick', function () {
+        if (editing) return;
+        editing = true;
+
+        const taskDiv = row.querySelector('div > div');
+        original = taskDiv.textContent.trim();
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.innerHTML = original;
+        input.value = original;
+        input.className = "input input-bordered";
+        input.style.width = "90%";
+
+
+        taskDiv.innerHTML = '';
+        taskDiv.appendChild(input);
+        input.focus();
+
+        // Confirm edit on click outside or enter
+        function confirmEdit(e) {
+          if (!editing) return;
+          // If click outside the input or ENTER
+          if (e.type === "mousedown" && !input.contains(e.target)) {
+            saveEdit();
+          }
+          if (e.type === "keydown" && e.key === "Enter") {
+            saveEdit();
+          }
+        }
+
+        function saveEdit() {
+          if (!editing) return;
+          editing = false;
+          document.removeEventListener('mousedown', confirmEdit);
+          input.removeEventListener('keydown', confirmEdit);
+
+          const newValue = input.value.trim();
+          if (newValue && newValue !== original) {
+            const taskId = row.querySelector('div > div').getAttribute('id');
+            const _taskPk = taskId.split('-')[3];
+            const htmxTarget = "#" + taskId;
+
+            if (taskId) {
+              const form = document.createElement('form');
+              form.style.display = 'none';
+              form.method = 'POST';
+              form.action = `/update/${_taskPk}/`;
+              form.setAttribute('hx-post', `/update/${_taskPk}/`);
+              form.setAttribute('hx-target', htmxTarget);
+              form.setAttribute('hx-swap', 'innerHTML');
+              form.addEventListener('htmx:afterRequest', function (event) {
+                if (event.detail && event.detail.xhr) {
+                  try {
+                    const json = JSON.parse(event.detail.xhr.responseText);
+                    if (json && json.title) {
+                      taskDiv.textContent = json.title;
+                    } else {
+                      taskDiv.textContent = newValue;
+                    }
+                  } catch (e) {
+                    taskDiv.textContent = newValue;
+                  }
+                } else {
+                  taskDiv.textContent = newValue;
+                }
+              });
+              // CSRF token
+              const csrf = document.createElement('input');
+              csrf.type = 'hidden';
+              csrf.name = 'csrfmiddlewaretoken';
+              csrf.value = "{{ csrf_token }}";
+              form.appendChild(csrf);
+              // Title field
+              const titleField = document.createElement('input');
+              titleField.type = 'hidden';
+              titleField.name = 'title';
+              titleField.value = newValue;
+              form.appendChild(titleField);
+
+              // Completed field
+              const completedField = document.createElement('input');
+              completedField.type = 'hidden';
+              completedField.name = 'completed';
+              completedField.value = '{{ task.completed|yesno:"true,false" }}';
+              form.appendChild(completedField);
+
+              // Add form to row
+              row.appendChild(form);
+              // Submit using htmx for AJAX (no page redirect)
+              if (window.htmx) {
+                window.htmx.process(form);
+                window.htmx.trigger(form, 'submit');
+              } else {
+                form.submit(); // fallback
+              }
+            } else {
+              taskDiv.textContent = newValue;
+            }
+          } else {
+            // Restore if no change or blank
+            taskDiv.textContent = original;
+          }
+        }
+        document.addEventListener('mousedown', confirmEdit);
+        input.addEventListener('keydown', confirmEdit);
+      });
+    });
+  });
+</script>
+<script>
+  function getCompletedObj(completed, title) {
+    console.log("getCompletedObj called with:", completed, title);
+    return { "title": title, "completed": (completed === "True" || completed === "true") ? "false" : "true" };
+  }
+</script>

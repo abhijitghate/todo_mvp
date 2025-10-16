@@ -1,0 +1,38 @@
+<div id="task_list">
+    <h1 class="text-2xl text-success mb-4 mt-4">Task List</h1>
+    <ul id="task_list_ul" class="list bg-base-100 rounded-box shadow-md">
+        {% if tasks %} 
+        {% for task in tasks %}
+            {% include 'fragments/single_task.html'%}
+        
+        {% endfor %}
+        <li class="mt-4 flex gap-4 justify-center">
+            <a
+                href="search"
+                class="link link-primary"
+                hx-get="search/"
+                hx-target="#task_list"
+            >All</a>
+            <a
+                href="search/?completed=true"
+                class="link link-primary"
+                hx-get="search/?completed=true"
+                hx-target="#task_list"
+            >Completed</a>
+            <a
+                href="search/?completed=false"
+                class="link link-primary"
+                hx-get="search/?completed=false"
+                hx-target="#task_list"
+            >Active</a>
+            <a
+                href="{% url 'bulk-delete-tasks' %}"
+                class="link link-primary"
+                hx-post="{% url 'bulk-delete-tasks' %}"
+                hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+                hx-target="#task_list"
+            >Clear completed</a>
+        </li>
+        {% endif %}
+    </ul>
+</div>
