@@ -53,8 +53,8 @@ DEBUG = True
 ALLOWED_HOSTS = [
     '13.48.248.20',
     'ec2-13-48-248-20.compute-1.amazonaws.com',
+    "127.0.0.1"
 ]
-
 
 # Application definition
 
@@ -108,9 +108,9 @@ POSTGREPORT = os.environ.get("POSTGREPORT", "5432")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "postgres",
-        "USER": "postgres",
-        "PASSWORD": "todomvcdbpassword",
+        "NAME": POSTGRENAME,
+        "USER": POSTGREUSER,
+        "PASSWORD": POSTGREPASSWORD,
         "HOST": POSTGREHOST,
         "PORT": POSTGREPORT,
     }
