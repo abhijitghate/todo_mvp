@@ -1,5 +1,3 @@
-
-
 import os
 from pathlib import Path
 
@@ -58,6 +56,7 @@ ALLOWED_HOSTS = []
 INSTALLED_APPS = [
     "django.contrib.admin",
     "django.contrib.auth",
+    "whitenoise.runserver_nostatic",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
@@ -73,6 +72,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "whitenoise.middleware.WhiteNoiseMiddleware",
 ]
 
 ROOT_URLCONF = "todo_app.urls"
@@ -95,7 +95,6 @@ TEMPLATES = [
 WSGI_APPLICATION = "todo_app.wsgi.application"
 
 
-
 POSTGRENAME = os.environ.get("POSTGRENAME", "todomvp")
 POSTGREUSER = os.environ.get("POSTGREUSER", "todomvpuser")
 POSTGREPASSWORD = os.environ.get("POSTGREPASSWORD", "todomvppassword")
@@ -103,10 +102,10 @@ POSTGREHOST = os.environ.get("POSTGREHOST", "localhost")
 POSTGREPORT = os.environ.get("POSTGREPORT", "5432")
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",  
+        "ENGINE": "django.db.backends.postgresql",
         "NAME": "postgres",
         "USER": "postgres",
-        "PASSWORD": POSTGREPASSWORD,
+        "PASSWORD": "todomvcdbpassword",
         "HOST": POSTGREHOST,
         "PORT": POSTGREPORT,
     }
@@ -147,6 +146,9 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = "static/"
+STATIC_ROOT = os.path.join(BASE_DIR, "todo_app", "static")
+MEDIA_URLS = "/media/"
+MEDIA_ROOT = os.path.join(BASE_DIR, "media")
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
