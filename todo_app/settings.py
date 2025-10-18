@@ -5,6 +5,7 @@ from dotenv import load_dotenv
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 load_dotenv("/home/ubuntu/todo_mvp/.env")
+# load_dotenv(os.path.join(BASE_DIR, ".env"))
 
 import logging
 
@@ -100,11 +101,11 @@ TEMPLATES = [
 WSGI_APPLICATION = "todo_app.wsgi.application"
 
 
-POSTGRENAME = os.environ.get("POSTGRENAME", "todomvp")
-POSTGREUSER = os.environ.get("POSTGREUSER", "todomvpuser")
-POSTGREPASSWORD = os.environ.get("POSTGREPASSWORD", "todomvppassword")
-POSTGREHOST = os.environ.get("POSTGREHOST", "localhost")
-POSTGREPORT = os.environ.get("POSTGREPORT", "5432")
+POSTGRENAME = os.environ.get("POSTGRENAME")
+POSTGREUSER = os.environ.get("POSTGREUSER")
+POSTGREPASSWORD = os.environ.get("POSTGREPASSWORD")
+POSTGREHOST = os.environ.get("POSTGREHOST")
+POSTGREPORT = os.environ.get("POSTGREPORT")
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
